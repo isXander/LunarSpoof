@@ -1,0 +1,29 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+
+        maven {
+            name = "Forge"
+            url = "https://maven.minecraftforge.net"
+        }
+
+        maven {
+            name = "Jitpack"
+            url = "https://jitpack.io/"
+        }
+    }
+
+    resolutionStrategy {
+        eachPlugin {
+            // Convert to forks of gradle plugins
+            if (requested.id.id == "net.minecraftforge.gradle.forge") {
+                useModule("com.github.asbyth:ForgeGradle:${requested.version}")
+            } else if (requested.id.id == 'org.spongepowered.mixin') {
+                useModule("com.github.LXGaming:MixinGradle:${requested.version}")
+            }
+        }
+    }
+}
+
+rootProject.name = "lunarspoof"

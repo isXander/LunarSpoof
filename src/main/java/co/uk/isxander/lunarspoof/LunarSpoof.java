@@ -6,16 +6,12 @@ import co.uk.isxander.lunarspoof.websocket.LunarAuthWebSocket;
 import co.uk.isxander.xanderlib.XanderLib;
 import co.uk.isxander.xanderlib.utils.Constants;
 import com.google.common.collect.ImmutableMap;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URISyntaxException;
-import java.util.function.Consumer;
 
 @Mod(modid = LunarSpoof.MOD_ID, name = LunarSpoof.MOD_NAME, version = LunarSpoof.MOD_VERSION, clientSideOnly = true)
 public class LunarSpoof implements Constants {

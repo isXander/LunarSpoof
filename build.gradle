@@ -1,25 +1,9 @@
-buildscript {
-    repositories {
-        maven {
-            name = "jitpack"
-            url = "https://jitpack.io/"
-        }
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = 'sponge'
-            url = 'https://repo.spongepowered.org/maven'
-        }
-    }
-    dependencies {
-        classpath "com.github.asbyth:ForgeGradle:86b2392"
-        classpath 'com.github.LXGaming:MixinGradle:d75e32e'
-    }
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'net.minecraftforge.gradle.forge' version '86b2392'
+    id 'org.spongepowered.mixin' version 'd75e32e'
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'org.spongepowered.mixin'
 
 version = "2.0"
 group = "co.uk.isxander"
@@ -29,6 +13,7 @@ minecraft {
     version = "1.8.9-11.15.1.2318-1.8.9"
     runDir = "run"
     mappings = "stable_22"
+    makeObfSourceJar = false
 }
 
 mixin {
@@ -41,37 +26,19 @@ repositories {
 }
 
 configurations {
-    embed
-    compile.extendsFrom(embed)
+    include
+    implementation.extendsFrom(include)
 }
 
 dependencies {
     provided files("libs/modcore.jar")
     provided files("libs/xanderlib.jar")
 
-    embed group: 'org.java-websocket', name: 'Java-WebSocket', version: '1.5.2'
+    include group: 'org.java-websocket', name: 'Java-WebSocket', version: '1.5.2'
 }
 
 jar {
-    dependsOn configurations.compile
-    from {
-        configurations.embed.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
-     }
-
-    configurations.embed.each { dep ->
-        from(project.zipTree(dep)) {
-            exclude 'META-INF', 'META-INF/**'
-        }
-        from(project.zipTree(dep)) {
-            include 'META-INF/services', 'META-INF/services/**'
-        }
-    }
-}
-
-jar {
-    archiveName = "[$minecraft.version-$version] LunarSpoof.jar"
+    archiveName = "[$minecraft.version-$project.version] LunarSpoof.jar"
 
     manifest {
         attributes "FMLCorePlugin": "co.uk.isxander.lunarspoof.forge.FMLLoadingPlugin",
@@ -105,3 +72,9 @@ task moveResources {
 
 tasks.moveResources.dependsOn processResources
 tasks.classes.dependsOn moveResources
+
+shadowJar {
+    archiveClassifier.set('')
+    configurations = [project.configurations.include]
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE
+}
