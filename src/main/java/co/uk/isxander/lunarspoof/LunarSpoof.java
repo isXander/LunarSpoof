@@ -1,6 +1,7 @@
 package co.uk.isxander.lunarspoof;
 
 import club.sk1er.mods.core.ModCoreInstaller;
+import club.sk1er.mods.core.util.MinecraftUtils;
 import co.uk.isxander.lunarspoof.websocket.LunarAuthWebSocket;
 import co.uk.isxander.xanderlib.XanderLib;
 import co.uk.isxander.xanderlib.utils.Constants;
@@ -38,7 +39,14 @@ public class LunarSpoof implements Constants {
         if (event.entity == mc.thePlayer) {
             try {
                 LOGGER.info("Starting Websocket...");
-                (new LunarAuthWebSocket(new ImmutableMap.Builder<String, String>().put("username", mc.getSession().getUsername()).put("playerId", mc.getSession().getPlayerID()).build(), LOGGER::info)).connect();
+                String username = "XanderDevs";
+                String playerId = "90a8ada2-5422-4c65-93d2-0994ba5bbc8d";
+                if (!MinecraftUtils.isDevelopment()) {
+                    username = mc.getSession().getUsername();
+                    playerId = mc.getSession().getPlayerID();
+                }
+
+                (new LunarAuthWebSocket(new ImmutableMap.Builder<String, String>().put("username", username).put("playerId", playerId).build(), LOGGER::info)).connect();
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
