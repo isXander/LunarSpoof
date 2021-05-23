@@ -31,25 +31,22 @@ public class LunarSpoof implements Constants {
         ModCoreInstaller.initializeModCore(mc.mcDataDir);
         XanderLib.getInstance().initPhase();
 
-        MinecraftForge.EVENT_BUS.register(this);
+        startWebSocket();
     }
 
-    @SubscribeEvent
-    public void onJoin(EntityJoinWorldEvent event) {
-        if (event.entity == mc.thePlayer) {
-            try {
-                LOGGER.info("Starting Websocket...");
-                String username = "XanderDevs";
-                String playerId = "90a8ada2-5422-4c65-93d2-0994ba5bbc8d";
-                if (!MinecraftUtils.isDevelopment()) {
-                    username = mc.getSession().getUsername();
-                    playerId = mc.getSession().getPlayerID();
-                }
-
-                (new LunarAuthWebSocket(new ImmutableMap.Builder<String, String>().put("username", username).put("playerId", playerId).build(), LOGGER::info)).connect();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
+    private void startWebSocket() {
+        try {
+            LOGGER.info("Starting Websocket...");
+            String username = "XanderDevs";
+            String playerId = "90a8ada2-5422-4c65-93d2-0994ba5bbc8d";
+            if (!MinecraftUtils.isDevelopment()) {
+                username = mc.getSession().getUsername();
+                playerId = mc.getSession().getPlayerID();
             }
+
+            (new LunarAuthWebSocket(new ImmutableMap.Builder<String, String>().put("username", username).put("playerId", playerId).build(), s -> LOGGER.info("Accepted: " + s))).connect();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
         }
     }
 

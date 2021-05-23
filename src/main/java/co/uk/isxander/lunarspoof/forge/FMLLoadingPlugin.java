@@ -19,12 +19,22 @@ import club.sk1er.mods.core.ModCoreInstaller;
 import co.uk.isxander.xanderlib.installer.XanderLibInstaller;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import org.spongepowered.asm.launch.MixinBootstrap;
+import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import java.util.Map;
 
 public class FMLLoadingPlugin implements IFMLLoadingPlugin {
     @Override
     public String[] getASMTransformerClass() {
+        // mixins
+        MixinBootstrap.init();
+        MixinEnvironment env = MixinEnvironment.getCurrentEnvironment();
+        if (env.getObfuscationContext() == null) {
+            env.setObfuscationContext("notch");
+        }
+        env.setSide(MixinEnvironment.Side.CLIENT);
+
         int initialize = ModCoreInstaller.initialize(Launch.minecraftHome, "1.8.9");
 
         // ModCore has been successfully installed. Now initialise XanderLib

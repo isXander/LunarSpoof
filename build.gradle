@@ -8,12 +8,18 @@ buildscript {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
+        maven {
+            name = 'sponge'
+            url = 'https://repo.spongepowered.org/maven'
+        }
     }
     dependencies {
         classpath "com.github.asbyth:ForgeGradle:86b2392"
+        classpath 'com.github.LXGaming:MixinGradle:d75e32e'
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
 
 version = "2.0"
 group = "co.uk.isxander"
@@ -25,8 +31,13 @@ minecraft {
     mappings = "stable_22"
 }
 
+mixin {
+    defaultObfuscationEnv = "notch"
+    add sourceSets.main, "mixins.lunarspoof.refmap.json"
+}
+
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 configurations {

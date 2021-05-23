@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "compatibilityLevel": "JAVA_8",
+  "package": "co.uk.isxander.lunarspoof.mixins",
+  "refmap": "mixins.lunarspoof.json",
+  "mixins": [
+
+  ]
+}

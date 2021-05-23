@@ -28,8 +28,8 @@ import java.util.function.Consumer;
 
 public class LunarAuthWebSocket extends WebSocketClient implements Constants {
 
-    private Consumer<String> consumer;
-    private boolean whatIsThis = false;
+    private final Consumer<String> consumer;
+    private boolean authenticated = false;
 
     public LunarAuthWebSocket(Map<String, String> httpHeaders, Consumer<String> consumer) throws URISyntaxException {
         super(new URI("wss://authenticator.lunarclientprod.com"), new Draft_6455(), httpHeaders, 30000);
@@ -71,7 +71,6 @@ public class LunarAuthWebSocket extends WebSocketClient implements Constants {
 
         packet.processJson(json);
         packet.process(this);
-
     }
 
     public void acceptEncryption(SPacketEncryptionRequest packet) {
@@ -93,7 +92,7 @@ public class LunarAuthWebSocket extends WebSocketClient implements Constants {
     }
 
     public void acceptAuthentication(SPacketAuthenticatedRequest packet) {
-        this.whatIsThis = true;
+        this.authenticated = true;
         close();
         this.consumer.accept(packet.getJwtKey());
     }
@@ -111,7 +110,7 @@ public class LunarAuthWebSocket extends WebSocketClient implements Constants {
     @Override
     public void onClose(int code, String reason, boolean remote) {
         LunarSpoof.LOGGER.info(String.format("Connection Closed (%d, \"%s\")", code, reason));
-        if (this.whatIsThis) return;
+        if (this.authenticated) return;
         this.consumer.accept(null);
     }
 
