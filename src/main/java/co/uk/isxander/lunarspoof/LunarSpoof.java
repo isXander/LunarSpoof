@@ -2,7 +2,7 @@ package co.uk.isxander.lunarspoof;
 
 import club.sk1er.mods.core.ModCoreInstaller;
 import club.sk1er.mods.core.util.MinecraftUtils;
-import co.uk.isxander.lunarspoof.websocket.LunarAuthWebSocket;
+import co.uk.isxander.lunarspoof.websocket.auth.LunarAuthWebSocket;
 import co.uk.isxander.xanderlib.XanderLib;
 import co.uk.isxander.xanderlib.utils.Constants;
 import com.google.common.collect.ImmutableMap;

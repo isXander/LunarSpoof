@@ -17,12 +17,17 @@ minecraft {
 }
 
 mixin {
-    defaultObfuscationEnv = "notch"
+    defaultObfuscationEnv = "searge"
     add sourceSets.main, "mixins.lunarspoof.refmap.json"
 }
 
 repositories {
     mavenCentral()
+
+    maven {
+        name = 'sponge'
+        url = 'https://repo.spongepowered.org/maven/'
+    }
 }
 
 configurations {
@@ -35,11 +40,19 @@ dependencies {
     provided files("libs/xanderlib.jar")
 
     include group: 'org.java-websocket', name: 'Java-WebSocket', version: '1.5.2'
-    include group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    //include group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+
+    implementation('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
+        exclude module: 'launchwrapper'
+        exclude module: 'guava'
+        exclude module: 'gson'
+        exclude module: 'commons-io'
+    }
+    annotationProcessor "org.spongepowered:mixin:0.7.11-SNAPSHOT"
 }
 
 jar {
-    archiveName = "[$minecraft.version-$project.version] LunarSpoof.jar"
+    archiveName = "[$minecraft.version-$project.version] LunarSpoof (Sources).jar"
 
     manifest {
         attributes "FMLCorePlugin": "co.uk.isxander.lunarspoof.forge.FMLLoadingPlugin",
@@ -54,7 +67,6 @@ processResources {
 
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-
         expand 'version':project.version, 'mcversion':project.minecraft.version
     }
 
@@ -75,7 +87,11 @@ tasks.moveResources.dependsOn processResources
 tasks.classes.dependsOn moveResources
 
 shadowJar {
+    archiveBaseName.set("[$minecraft.version-$project.version] LunarSpoof")
+    archiveVersion.set('')
     archiveClassifier.set('')
     configurations = [project.configurations.include]
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
 }
+
+jar.dependsOn shadowJar

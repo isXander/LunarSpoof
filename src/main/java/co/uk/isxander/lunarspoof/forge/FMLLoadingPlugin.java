@@ -31,7 +31,7 @@ public class FMLLoadingPlugin implements IFMLLoadingPlugin {
         MixinBootstrap.init();
         MixinEnvironment env = MixinEnvironment.getCurrentEnvironment();
         if (env.getObfuscationContext() == null) {
-            env.setObfuscationContext("notch");
+            env.setObfuscationContext("searge");
         }
         env.setSide(MixinEnvironment.Side.CLIENT);
 
