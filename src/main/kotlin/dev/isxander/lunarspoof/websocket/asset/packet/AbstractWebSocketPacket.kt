@@ -8,9 +8,9 @@ import net.minecraft.network.PacketBuffer
 abstract class AbstractWebSocketPacket {
     protected val LOGGER = LunarAssetWebSocket.LOGGER
 
-    abstract fun unknown(buf: PacketBuffer)
-    abstract fun processBuf(buf: PacketBuffer)
-    abstract fun processSocket(socket: LunarAssetWebSocket)
+    abstract fun write(buf: PacketBuffer)
+    abstract fun read(buf: PacketBuffer)
+    abstract fun handle(socket: LunarAssetWebSocket)
 
     fun writeKey(buf: PacketBuffer, array: ByteArray) {
         buf.writeShort(array.size)

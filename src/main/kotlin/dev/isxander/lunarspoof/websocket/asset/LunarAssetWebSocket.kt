@@ -1,8 +1,7 @@
 package dev.isxander.lunarspoof.websocket.asset
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
-import dev.isxander.lunarspoof.utils.LunarTimer
+import dev.isxander.lunarspoof.LunarSpoof
+import dev.isxander.lunarspoof.feature.indicator.LunarNameTagIcon
 import dev.isxander.lunarspoof.websocket.asset.packet.AbstractWebSocketPacket
 import dev.isxander.lunarspoof.websocket.asset.packet.impl.WSPacketClientUnknownCosmetic
 import io.netty.buffer.Unpooled
@@ -11,11 +10,8 @@ import org.apache.logging.log4j.LogManager
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.drafts.Draft_6455
 import org.java_websocket.handshake.ServerHandshake
-import org.lwjgl.Sys
 import java.net.URI
 import java.nio.ByteBuffer
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 @Suppress("unstable")
 class LunarAssetWebSocket(
@@ -26,15 +22,8 @@ class LunarAssetWebSocket(
     httpHeaders,
     30000
 ) {
-    val someCache: Cache<UUID, Boolean> = CacheBuilder.newBuilder().expireAfterWrite(3L, TimeUnit.MINUTES).build()
-    var someTimer: LunarTimer? = null
-    var currentState: AssetState = AssetState.DISCONNECTED
-    var time: Long = 0
     override fun onOpen(handshakedata: ServerHandshake) {
         LOGGER.info("Connection Opened.")
-        someTimer = null
-        currentState = AssetState.AWAITING_ENCRYPTION_REQUEST
-        time = System.currentTimeMillis()
     }
 
     override fun onMessage(message: String) {}
@@ -43,20 +32,34 @@ class LunarAssetWebSocket(
     }
 
     private fun processPacketBuffer(buf: PacketBuffer) {
-        val clazz = AbstractWebSocketPacket.REGISTRY.inverse()[buf.readVarIntFromBuffer()]
+        val packetId = buf.readVarIntFromBuffer()
+        val clazz = AbstractWebSocketPacket.REGISTRY.inverse()[packetId]
         try {
+            if (clazz == null) LOGGER.error("Unknown packet ID: $packetId")
             val packet = clazz?.newInstance() ?: return
             LOGGER.debug("Recieved: ${clazz.simpleName}")
-            packet.processBuf(buf)
-            packet.processSocket(this)
+            packet.read(buf)
+            packet.handle(this)
         } catch (e: Exception) {
             LOGGER.error("Error from: $clazz")
             e.printStackTrace()
         }
     }
 
-    fun processUnknownCosmetic(packet: WSPacketClientUnknownCosmetic) {
+    fun sendPacket(packet: AbstractWebSocketPacket) {
+        if (!this.isOpen) return
+        val packetBuffer = PacketBuffer(Unpooled.buffer())
+        packet.write(packetBuffer)
+        val data = ByteArray(packetBuffer.readableBytes())
+        packetBuffer.readBytes(data)
+        packetBuffer.release()
+        this.send(data)
+        LOGGER.debug("Sent: ${packet::class.simpleName}")
+    }
 
+    fun processUnknownCosmetic(packet: WSPacketClientUnknownCosmetic) {
+        LOGGER.info("PLAYER: ${packet.playerId}")
+        LunarSpoof.lunarUsers[packet.playerId] = LunarNameTagIcon(packet.color, packet.bl)
     }
 
     override fun onClose(code: Int, reason: String, remote: Boolean) {

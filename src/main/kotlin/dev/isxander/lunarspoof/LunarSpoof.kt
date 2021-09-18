@@ -1,6 +1,7 @@
 package dev.isxander.lunarspoof
 
 import com.google.common.collect.ImmutableMap
+import dev.isxander.lunarspoof.feature.indicator.LunarNameTagIcon
 import dev.isxander.lunarspoof.websocket.asset.LunarAssetWebSocket
 import dev.isxander.lunarspoof.websocket.auth.LunarAuthWebSocket
 import gg.essential.api.EssentialAPI
@@ -11,6 +12,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.Sys
 import java.net.URISyntaxException
+import java.util.*
 
 @Mod(modid = LunarSpoof.ID, name = LunarSpoof.NAME, version = LunarSpoof.VERSION, clientSideOnly = true, modLanguageAdapter = "gg.essential.api.utils.KotlinAdapter")
 object LunarSpoof {
@@ -21,6 +23,7 @@ object LunarSpoof {
     val LOGGER = LogManager.getLogger("LunarSpoof")
 
     private var assetSocket: LunarAssetWebSocket? = null
+    val lunarUsers = mutableMapOf<UUID, LunarNameTagIcon>()
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
@@ -60,11 +63,11 @@ object LunarSpoof {
                     LOGGER.debug("Authentication: $auth")
                     val httpHeaders = mapOf(
                         "accountType" to mc.session.sessionType.name,
-                        "version" to "1.8.9",
+                        "version" to "v1_8",
                         "gitCommit" to "6f9eb864d0d24cafb109d638a849d13ad67d5979",
                         "branch" to "master",
                         "os" to System.getProperty("os.name"),
-                        "arch" to System.getProperty("os.arch", System.getenv("PROCESSOR_ARCHITECTURE")),
+                        "arch" to (System.getProperty("os.arch") ?: System.getenv("PROCESSOR_ARCHITECTURE")),
                         "server" to (mc.currentServerData?.serverIP ?: ""),
                         "launcherVersion" to "2.7.5",
                         "username" to mc.session.username,
