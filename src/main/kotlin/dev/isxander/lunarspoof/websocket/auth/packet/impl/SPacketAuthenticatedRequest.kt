@@ -1,10 +1,10 @@
 package dev.isxander.lunarspoof.websocket.auth.packet.impl
 
 import dev.isxander.lunarspoof.websocket.auth.LunarAuthWebSocket
-import dev.isxander.lunarspoof.websocket.auth.packet.LunarPacket
+import dev.isxander.lunarspoof.websocket.auth.packet.AuthenticatorPacket
 import gg.essential.api.utils.JsonHolder
 
-class SPacketAuthenticatedRequest : LunarPacket() {
+class SPacketAuthenticatedRequest : AuthenticatorPacket() {
     override val name: String = "SPacketAuthenticatedRequest"
     lateinit var jwtKey: String
         private set

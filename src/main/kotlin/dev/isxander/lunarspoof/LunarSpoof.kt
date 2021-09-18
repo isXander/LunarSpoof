@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import org.apache.logging.log4j.LogManager
+import org.lwjgl.Sys
 import java.net.URISyntaxException
 
 @Mod(modid = LunarSpoof.ID, name = LunarSpoof.NAME, version = LunarSpoof.VERSION, clientSideOnly = true, modLanguageAdapter = "gg.essential.api.utils.KotlinAdapter")
@@ -23,8 +24,7 @@ object LunarSpoof {
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
-        Multithreading.runAsync { startAuthSocket { println(it) } }
-//        startAssetWebSocket()
+        startAssetWebSocket()
     }
 
     private fun startAuthSocket(consumer: (String?) -> Unit) {
@@ -32,10 +32,10 @@ object LunarSpoof {
             LOGGER.info("Starting Authentication WebSocket...")
             var username = "XanderDevs"
             var playerId = "90a8ada2-5422-4c65-93d2-0994ba5bbc8d"
-//            if (!EssentialAPI.getMinecraftUtil().isDevelopment()) {
-//                username = mc.session.username
-//                playerId = mc.session.playerID
-//            }
+            if (!EssentialAPI.getMinecraftUtil().isDevelopment()) {
+                username = mc.session.username
+                playerId = mc.session.playerID
+            }
 
             LunarAuthWebSocket(
                 mapOf(
@@ -46,44 +46,45 @@ object LunarSpoof {
             ).connect()
         } catch (e: URISyntaxException) {
             e.printStackTrace()
-            consumer(null)
         }
     }
 
-//    private fun startAssetWebSocket() {
-//        Multithreading.runAsync {
-//            try {
-//                if (assetSocket != null && assetSocket.isOpen()) {
-//                    assetSocket.closeBlocking()
-//                }
-//                startAuthSocket { auth ->
-//                    LOGGER.info("Starting Asset WebSocket...")
-//                    if (auth == null) return@startAuthSocket
-//                    val httpHeaders = mutableMapOf<String, String>()
-//                    httpHeaders["accountType"] = mc.session.sessionType.name()
-//                    httpHeaders["version"] = "1.8.9"
-//                    httpHeaders["commitId"] = "6f9eb864d0d24cafb109d638a849d13ad67d5979"
-//                    httpHeaders["branch"] = "master"
-//                    httpHeaders["os"] = System.getProperty("os.name")
-//                    httpHeaders["arch"] = System.getProperty("os.arch", System.getenv("PROCESSOR_ARCHITECTURE"))
-//                    val server = mc.currentServerData
-//                    httpHeaders["server"] = if (server == null) "" else server.serverIP
-//                    httpHeaders["launcherVersion"] = "2.7.1"
-//                    httpHeaders["username"] = mc.session.username
-//                    httpHeaders["playerId"] = mc.session.playerID
-//                    httpHeaders["Authorization"] = auth
-//                    httpHeaders["protocolVersion"] = "1"
-//                    try {
-//                        LunarAssetWebSocket(httpHeaders).also { assetSocket = it }.connect()
-//                    } catch (e: URISyntaxException) {
-//                        e.printStackTrace()
-//                    }
-//                }
-//            } catch (e: InterruptedException) {
-//                e.printStackTrace()
-//            }
-//        }
-//    }
+    private fun startAssetWebSocket() {
+        Multithreading.runAsync {
+            try {
+                if (assetSocket != null && assetSocket!!.isOpen) {
+                    assetSocket!!.closeBlocking()
+                }
+                startAuthSocket { auth ->
+                    LOGGER.info("Starting Asset WebSocket...")
+                    LOGGER.debug("Authentication: $auth")
+                    val httpHeaders = mapOf(
+                        "accountType" to mc.session.sessionType.name,
+                        "version" to "1.8.9",
+                        "gitCommit" to "6f9eb864d0d24cafb109d638a849d13ad67d5979",
+                        "branch" to "master",
+                        "os" to System.getProperty("os.name"),
+                        "arch" to System.getProperty("os.arch", System.getenv("PROCESSOR_ARCHITECTURE")),
+                        "server" to (mc.currentServerData?.serverIP ?: ""),
+                        "launcherVersion" to "2.7.5",
+                        "username" to mc.session.username,
+                        "playerId" to mc.session.playerID,
+                        "Authorization" to auth!!,
+                        "protocolVersion" to "1"
+                    )
+                    LOGGER.debug("Headers: ")
+                    LOGGER.debug(httpHeaders)
+                    try {
+                        LunarAssetWebSocket(httpHeaders).also { assetSocket = it }.connect()
+                    } catch (e: URISyntaxException) {
+                        e.printStackTrace()
+                    }
+                }
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+        }
+    }
 }
 
 val mc: Minecraft

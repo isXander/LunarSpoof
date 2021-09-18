@@ -1,7 +1,7 @@
 package dev.isxander.lunarspoof.websocket.auth.packet.impl
 
 import dev.isxander.lunarspoof.websocket.auth.LunarAuthWebSocket
-import dev.isxander.lunarspoof.websocket.auth.packet.LunarPacket
+import dev.isxander.lunarspoof.websocket.auth.packet.AuthenticatorPacket
 import gg.essential.api.utils.JsonHolder
 import net.minecraft.util.CryptManager
 import java.security.PublicKey
@@ -12,7 +12,7 @@ class CPacketEncryptionResponse(
     secretKey: SecretKey,
     publicKey: PublicKey,
     keyHash: ByteArray,
-) : LunarPacket() {
+) : AuthenticatorPacket() {
     private val secretHash: ByteArray
     private val publicHash: ByteArray
     override val name: String = "CPacketEncryptionResponse"

@@ -48,7 +48,7 @@ dependencies {
     include "gg.essential:loader-launchwrapper:1.1.1"
     implementation "gg.essential:essential-1.8.9-forge:1359"
 
-    include "org.java-websocket:Java-WebSocket:1.5.2"
+    implementation "org.java-websocket:Java-WebSocket:1.5.2"
 
     annotationProcessor "org.spongepowered:mixin:0.7.11-SNAPSHOT"
 }
@@ -83,7 +83,7 @@ processResources {
 task moveResources {
     doLast {
         ant.move file: "${buildDir}/resources/main",
-                todir: "${buildDir}/classes/java"
+                todir: "${buildDir}/classes/kotlin"
     }
 }
 

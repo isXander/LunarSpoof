@@ -3,7 +3,7 @@ package dev.isxander.lunarspoof.websocket.auth
 import com.mojang.authlib.exceptions.AuthenticationException
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService
 import dev.isxander.lunarspoof.mc
-import dev.isxander.lunarspoof.websocket.auth.packet.LunarPacket
+import dev.isxander.lunarspoof.websocket.auth.packet.AuthenticatorPacket
 import dev.isxander.lunarspoof.websocket.auth.packet.impl.CPacketEncryptionResponse
 import dev.isxander.lunarspoof.websocket.auth.packet.impl.SPacketAuthenticatedRequest
 import dev.isxander.lunarspoof.websocket.auth.packet.impl.SPacketEncryptionRequest
@@ -19,7 +19,6 @@ import java.net.Proxy
 import java.net.URI
 import java.nio.ByteBuffer
 import java.util.*
-
 
 class LunarAuthWebSocket(
     httpHeaders: Map<String, String>,
@@ -41,7 +40,7 @@ class LunarAuthWebSocket(
     }
 
     fun processMessage(json: JsonHolder) {
-        val packet: LunarPacket
+        val packet: AuthenticatorPacket
         val packetType = json.optString("packetType")
         packet = when (packetType) {
             "SPacketEncryptionRequest" -> SPacketEncryptionRequest()
@@ -79,7 +78,7 @@ class LunarAuthWebSocket(
         consumer(packet.jwtKey)
     }
 
-    fun sendPacket(packet: LunarPacket) {
+    fun sendPacket(packet: AuthenticatorPacket) {
         if (!isOpen) return
         LOGGER.info("Sending Packet: " + packet.name)
         val json = JsonHolder()
@@ -90,7 +89,7 @@ class LunarAuthWebSocket(
 
     override fun onClose(code: Int, reason: String, remote: Boolean) {
         if (code == 1000) {
-            LOGGER.info("Authentication Completed.")
+            LOGGER.info("Authentication Succeeded.")
         }
         LOGGER.info(String.format("Connection Closed (%d, \"%s\")", code, reason))
         if (authenticated) return

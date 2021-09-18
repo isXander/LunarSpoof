@@ -1,13 +1,13 @@
 package dev.isxander.lunarspoof.websocket.auth.packet.impl
 
 import dev.isxander.lunarspoof.websocket.auth.LunarAuthWebSocket
-import dev.isxander.lunarspoof.websocket.auth.packet.LunarPacket
+import dev.isxander.lunarspoof.websocket.auth.packet.AuthenticatorPacket
 import gg.essential.api.utils.JsonHolder
 import net.minecraft.util.CryptManager
 import java.security.PublicKey
 import java.util.*
 
-class SPacketEncryptionRequest : LunarPacket() {
+class SPacketEncryptionRequest : AuthenticatorPacket() {
     override val name: String = "SPacketEncryptionRequest"
 
     lateinit var key: PublicKey
